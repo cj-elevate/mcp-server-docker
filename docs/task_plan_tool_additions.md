@@ -4,7 +4,7 @@ doc: task_plan
 project: docker-mcp
 created: 2026-01-18
 updated: 2026-01-19
-status: active
+status: complete
 priority: P1
 ---
 
@@ -106,10 +106,10 @@ class InspectVolumeInput(JSONParsingModel):
 - Clear descriptions without "(default: X)" redundancy
 
 **Acceptance Criteria:**
-- [ ] All schemas inherit from `JSONParsingModel`
-- [ ] Field descriptions are clear for LLM consumption
-- [ ] Defaults match Docker CLI conventions
-- [ ] Input validation prevents invalid Docker API calls
+- [x]All schemas inherit from `JSONParsingModel`
+- [x]Field descriptions are clear for LLM consumption
+- [x]Defaults match Docker CLI conventions
+- [x]Input validation prevents invalid Docker API calls
 
 ---
 
@@ -148,9 +148,9 @@ def volume_inspect_to_dict(volume: Volume, include_attrs: bool = False) -> dict[
 ```
 
 **Acceptance Criteria:**
-- [ ] Helpers return curated data by default
-- [ ] `include_attrs=True` adds full raw `attrs`
-- [ ] No sensitive data leaked in default output
+- [x]Helpers return curated data by default
+- [x]`include_attrs=True` adds full raw `attrs`
+- [x]No sensitive data leaked in default output
 
 ---
 
@@ -194,9 +194,9 @@ types.Tool(
 ```
 
 **Acceptance Criteria:**
-- [ ] All 6 tools registered
-- [ ] Descriptions are clear and actionable
-- [ ] Tool count increases from 19 to 25
+- [x]All 6 tools registered
+- [x]Descriptions are clear and actionable
+- [x]Tool count increases from 19 to 25
 
 ---
 
@@ -301,11 +301,11 @@ except ValidationError as e:
 | `tag_image` | Image not found | Caught by `ImageNotFound` exception |
 
 **Acceptance Criteria:**
-- [ ] All handlers use `asyncio.to_thread()` for blocking ops
-- [ ] State mutations call `container.reload()` before output
-- [ ] Docker-specific exceptions caught and returned as text
-- [ ] No exceptions bubble up to crash server
-- [ ] Pause/unpause are idempotent (LLM-friendly)
+- [x]All handlers use `asyncio.to_thread()` for blocking ops
+- [x]State mutations call `container.reload()` before output
+- [x]Docker-specific exceptions caught and returned as text
+- [x]No exceptions bubble up to crash server
+- [x]Pause/unpause are idempotent (LLM-friendly)
 
 ---
 
@@ -344,9 +344,9 @@ search_tools("inspect")
 | Invalid | `restart_container(container_id="")` | ERROR: Invalid inputs |
 
 **Acceptance Criteria:**
-- [ ] All 6 tools discoverable via `search_tools()`
-- [ ] All functional tests pass
-- [ ] Error tests return friendly messages (not stack traces)
+- [x]All 6 tools discoverable via `search_tools()`
+- [x]All functional tests pass
+- [x]Error tests return friendly messages (not stack traces)
 
 ---
 
@@ -377,9 +377,9 @@ search_tools("inspect")
 - Update examples
 
 **Acceptance Criteria:**
-- [ ] CLAUDE.md reflects new capabilities
-- [ ] CHANGELOG.md has dated entry
-- [ ] README.md documents all 25 tools
+- [x]CLAUDE.md reflects new capabilities
+- [x]CHANGELOG.md has dated entry
+- [x]README.md documents all 25 tools
 
 ---
 
@@ -396,11 +396,11 @@ search_tools("inspect")
 
 ## Success Criteria
 
-- [ ] Tool count: 19 → 25
-- [ ] All new tools pass functional tests
-- [ ] No regressions in existing tools
-- [ ] Error handling improved (Docker-specific exceptions)
-- [ ] Documentation updated
+- [x]Tool count: 19 → 25
+- [x]All new tools pass functional tests
+- [x]No regressions in existing tools
+- [x]Error handling improved (Docker-specific exceptions)
+- [x]Documentation updated
 
 ---
 

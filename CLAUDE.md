@@ -4,6 +4,7 @@ area: mcp-servers
 path: D:\servers\docker-mcp
 status: active
 updated: 2026-01-17
+tags: [docker, containers, images, compose, mcp]
 ---
 
 # Docker MCP (Python)
@@ -52,9 +53,9 @@ npx @modelcontextprotocol/inspector uv run mcp-server-docker
 4. **uv required** - Uses `uv` package manager for dependency management
 5. **Python 3.12+** - Requires modern Python (installed at `C:\Python312`)
 
-## Tools (18 Total)
+## Tools (25 Total)
 
-### Container Management (8)
+### Container Management (11)
 - `list_containers` - List all containers
 - `create_container` - Create without starting
 - `run_container` - Create and start
@@ -63,23 +64,29 @@ npx @modelcontextprotocol/inspector uv run mcp-server-docker
 - `stop_container` - Stop running container
 - `remove_container` - Delete container
 - `fetch_container_logs` - Get container logs
+- `pause_container` - Pause a running container (idempotent)
+- `unpause_container` - Unpause a paused container (idempotent)
+- `restart_container` - Restart with configurable timeout
 
-### Image Management (5)
+### Image Management (6)
 - `list_images` - List local images
 - `pull_image` - Download from registry
 - `push_image` - Upload to registry
 - `build_image` - Build from Dockerfile
 - `remove_image` - Delete local image
+- `tag_image` - Tag image with new repository/tag
 
-### Network Management (3)
+### Network Management (4)
 - `list_networks` - List Docker networks
 - `create_network` - Create new network
 - `remove_network` - Delete network
+- `inspect_network` - Detailed network info
 
-### Volume Management (3)
+### Volume Management (4)
 - `list_volumes` - List Docker volumes
 - `create_volume` - Create new volume
 - `remove_volume` - Delete volume
+- `inspect_volume` - Detailed volume info
 
 ### Prompts (1)
 - `docker_compose` - Natural language container deployment with plan+apply loop
@@ -89,10 +96,6 @@ npx @modelcontextprotocol/inspector uv run mcp-server-docker
 These Ruby tools are NOT included (intentionally excluded for security):
 - `exec_container` - Use shell MCP server instead
 - `copy_to_container` - Use volume mounts instead
-- `pause_container` / `unpause_container` - Rarely used
-- `restart_container` - Can do: stop + start
-- `tag_image` - Can do: `docker tag` via shell
-- `inspect_network` / `inspect_volume` - Use `docker inspect` via shell
 
 ## Security
 
@@ -109,14 +112,14 @@ This MCP has **root-equivalent access** to Docker daemon.
 Part of master-mcp-proxy scope system:
 - Backend ID: `docker`
 - Scope ID: `docker`
-- Tools: 18 (8 container, 5 image, 3 network, 3 volume)
+- Tools: 25 (11 container, 6 image, 4 network, 4 volume)
 - Source: https://github.com/ckreiling/mcp-server-docker
 
 ## Fork Modifications
 
-This is a fork of `ckreiling/mcp-server-docker` with planned enhancements:
-- [ ] Add `pause_container` / `unpause_container`
-- [ ] Add `restart_container`
-- [ ] Add `tag_image`
-- [ ] Add `inspect_network` / `inspect_volume`
+This is a fork of `ckreiling/mcp-server-docker` with enhancements:
+- [x] Add `pause_container` / `unpause_container`
+- [x] Add `restart_container`
+- [x] Add `tag_image`
+- [x] Add `inspect_network` / `inspect_volume`
 - [ ] Optional: `exec_container` with `confirm_dangerous` toggle

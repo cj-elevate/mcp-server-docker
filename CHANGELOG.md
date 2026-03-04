@@ -1,7 +1,7 @@
 ---
 type: doc
 doc: changelog
-updated: 2026-01-17
+updated: 2026-03-04
 ---
 
 # Changelog
@@ -9,6 +9,22 @@ updated: 2026-01-17
 All notable changes to docker-mcp integration.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
+
+## [2026-03-04] - Tool Additions
+
+### Added
+- `pause_container` - Pause a running container (idempotent)
+- `unpause_container` - Unpause a paused container (idempotent)
+- `restart_container` - Restart container with configurable timeout
+- `tag_image` - Tag an image with new repository/tag
+- `inspect_network` - Detailed network info with optional raw attrs
+- `inspect_volume` - Detailed volume info with optional raw attrs
+- Docker-specific error handling (NotFound, APIError, ImageNotFound)
+- Async threading via `asyncio.to_thread()` for blocking Docker SDK calls
+- State refresh via `container.reload()` after mutations
+
+### Changed
+- Tool count: 19 → 25
 
 ## [2026-01-17] - Python Migration
 
@@ -37,10 +53,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/)
 - `inspect_network` / `inspect_volume` tools
 
 ### Planned
-- Add back `pause_container` / `unpause_container`
-- Add back `restart_container`
-- Add back `tag_image`
-- Add back `inspect_network` / `inspect_volume`
+- ~~Add back `pause_container` / `unpause_container`~~ (done 2026-03-04)
+- ~~Add back `restart_container`~~ (done 2026-03-04)
+- ~~Add back `tag_image`~~ (done 2026-03-04)
+- ~~Add back `inspect_network` / `inspect_volume`~~ (done 2026-03-04)
 - Optional: `exec_container` with `confirm_dangerous` toggle
 
 ### Archived

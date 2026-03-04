@@ -1,3 +1,4 @@
+import asyncio
 import json
 from collections.abc import Sequence
 from typing import Any
@@ -5,6 +6,7 @@ import traceback
 
 import docker
 import mcp.types as types
+from docker.errors import NotFound, APIError, ImageNotFound
 from docker.models.containers import Container
 from mcp.server import Server
 from pydantic import AnyUrl, ValidationError
@@ -17,6 +19,8 @@ from .input_schemas import (
     CreateVolumeInput,
     DockerComposePromptInput,
     FetchContainerLogsInput,
+    InspectNetworkInput,
+    InspectVolumeInput,
     ListContainersInput,
     ListImagesInput,
     ListNetworksInput,
@@ -27,8 +31,10 @@ from .input_schemas import (
     RemoveImageInput,
     RemoveNetworkInput,
     RemoveVolumeInput,
+    RestartContainerInput,
+    TagImageInput,
 )
-from .output_schemas import docker_to_dict
+from .output_schemas import docker_to_dict, network_inspect_to_dict, volume_inspect_to_dict
 from .settings import ServerSettings
 
 app = Server("docker-server")
@@ -336,6 +342,36 @@ async def list_tools() -> list[types.Tool]:
             description="Remove a Docker volume",
             inputSchema=RemoveVolumeInput.model_json_schema(),
         ),
+        types.Tool(
+            name="pause_container",
+            description="Pause a running Docker container",
+            inputSchema=ContainerActionInput.model_json_schema(),
+        ),
+        types.Tool(
+            name="unpause_container",
+            description="Unpause a paused Docker container",
+            inputSchema=ContainerActionInput.model_json_schema(),
+        ),
+        types.Tool(
+            name="restart_container",
+            description="Restart a Docker container",
+            inputSchema=RestartContainerInput.model_json_schema(),
+        ),
+        types.Tool(
+            name="tag_image",
+            description="Tag an image with a new repository and tag",
+            inputSchema=TagImageInput.model_json_schema(),
+        ),
+        types.Tool(
+            name="inspect_network",
+            description="Get detailed information about a Docker network",
+            inputSchema=InspectNetworkInput.model_json_schema(),
+        ),
+        types.Tool(
+            name="inspect_volume",
+            description="Get detailed information about a Docker volume",
+            inputSchema=InspectVolumeInput.model_json_schema(),
+        ),
     ]
 
 
@@ -465,6 +501,61 @@ async def call_tool(
             volume.remove(force=args.force)
             result = docker_to_dict(volume)
 
+        elif name == "pause_container":
+            args = ContainerActionInput(**arguments)
+            container = _docker.containers.get(args.container_id)
+            try:
+                await asyncio.to_thread(container.pause)
+                await asyncio.to_thread(container.reload)
+                result = docker_to_dict(container)
+            except APIError as e:
+                if "already paused" in str(e).lower():
+                    await asyncio.to_thread(container.reload)
+                    result = {"status": "already_paused", "message": "Container was already paused", **docker_to_dict(container)}
+                else:
+                    raise
+
+        elif name == "unpause_container":
+            args = ContainerActionInput(**arguments)
+            container = _docker.containers.get(args.container_id)
+            try:
+                await asyncio.to_thread(container.unpause)
+                await asyncio.to_thread(container.reload)
+                result = docker_to_dict(container)
+            except APIError as e:
+                if "not paused" in str(e).lower():
+                    await asyncio.to_thread(container.reload)
+                    result = {"status": "already_running", "message": "Container was not paused", **docker_to_dict(container)}
+                else:
+                    raise
+
+        elif name == "restart_container":
+            args = RestartContainerInput(**arguments)
+            container = _docker.containers.get(args.container_id)
+            await asyncio.to_thread(container.restart, timeout=args.timeout)
+            await asyncio.to_thread(container.reload)
+            result = docker_to_dict(container)
+
+        elif name == "tag_image":
+            args = TagImageInput(**arguments)
+            image = _docker.images.get(args.image)
+            success = await asyncio.to_thread(image.tag, args.repository, tag=args.tag)
+            result = {
+                "status": "tagged" if success else "tag_failed",
+                "image": args.image,
+                "new_tag": f"{args.repository}:{args.tag}",
+            }
+
+        elif name == "inspect_network":
+            args = InspectNetworkInput(**arguments)
+            network = _docker.networks.get(args.network_id)
+            result = network_inspect_to_dict(network, include_attrs=args.include_attrs)
+
+        elif name == "inspect_volume":
+            args = InspectVolumeInput(**arguments)
+            volume = _docker.volumes.get(args.volume_name)
+            result = volume_inspect_to_dict(volume, include_attrs=args.include_attrs)
+
         else:
             return [types.TextContent(type="text", text=f"Unknown tool: {name}")]
 
@@ -477,6 +568,16 @@ async def call_tool(
                 type="text", text=f"ERROR: You provided invalid Tool inputs: {e}"
             )
         ]
+
+    except ImageNotFound as e:
+        return [types.TextContent(type="text", text=f"ERROR: Image not found: {e}")]
+
+    except NotFound as e:
+        return [types.TextContent(type="text", text=f"ERROR: Resource not found: {e}")]
+
+    except APIError as e:
+        await app.request_context.session.send_log_message("error", str(e))
+        return [types.TextContent(type="text", text=f"ERROR: Docker API error: {e}")]
 
     except Exception as e:
         await app.request_context.session.send_log_message(

@@ -206,6 +206,31 @@ class RemoveVolumeInput(JSONParsingModel):
     force: bool = Field(False, description="Force remove the volume")
 
 
+class RestartContainerInput(JSONParsingModel):
+    """Restart a container with optional timeout."""
+    container_id: str = Field(..., min_length=1, description="Container ID or name")
+    timeout: int = Field(10, ge=0, description="Seconds to wait before killing")
+
+
+class TagImageInput(JSONParsingModel):
+    """Tag an image with a new repository/tag."""
+    image: str = Field(..., min_length=1, description="Image ID, name, or name:tag to tag")
+    repository: str = Field(..., min_length=1, description="Repository name for the new tag")
+    tag: str = Field("latest", min_length=1, description="Tag name")
+
+
+class InspectNetworkInput(JSONParsingModel):
+    """Inspect a Docker network."""
+    network_id: str = Field(..., min_length=1, description="Network ID or name")
+    include_attrs: bool = Field(False, description="Include full raw attributes")
+
+
+class InspectVolumeInput(JSONParsingModel):
+    """Inspect a Docker volume."""
+    volume_name: str = Field(..., min_length=1, description="Volume name")
+    include_attrs: bool = Field(False, description="Include full raw attributes")
+
+
 class DockerComposePromptInput(BaseModel):
     name: str
     containers: str

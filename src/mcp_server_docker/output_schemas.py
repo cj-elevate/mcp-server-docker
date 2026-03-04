@@ -77,3 +77,30 @@ def docker_to_dict(
         raise ValueError(f"Unsupported object type: {type(obj)}")
 
     return result if overrides is None else {**result, **overrides}
+
+
+def network_inspect_to_dict(network: Network, include_attrs: bool = False) -> dict[str, Any]:
+    """Extended network info for inspect operations."""
+    base = docker_to_dict(network)
+    base.update({
+        "ipam": network.attrs.get("IPAM"),
+        "options": network.attrs.get("Options"),
+        "containers": list(network.attrs.get("Containers", {}).keys()),
+        "internal": network.attrs.get("Internal", False),
+        "attachable": network.attrs.get("Attachable", False),
+    })
+    if include_attrs:
+        base["attrs"] = network.attrs
+    return base
+
+
+def volume_inspect_to_dict(volume: Volume, include_attrs: bool = False) -> dict[str, Any]:
+    """Extended volume info for inspect operations."""
+    base = docker_to_dict(volume)
+    base.update({
+        "options": volume.attrs.get("Options"),
+        "status": volume.attrs.get("Status"),
+    })
+    if include_attrs:
+        base["attrs"] = volume.attrs
+    return base
