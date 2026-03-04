@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "master-mcp-proxy"
+  ],
+  "enableAllProjectMcpServers": true
+}
