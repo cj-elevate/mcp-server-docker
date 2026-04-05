@@ -45,6 +45,34 @@ npx @modelcontextprotocol/inspector uv run mcp-server-docker
 - **Natural language compose**: Use `docker_compose` prompt for LLM-driven deployments
 - **Disable when done**: `disable_scopes(["docker"])` to reduce attack surface
 
+## Programmatic Testing
+
+| Field | Value |
+|-------|-------|
+| Service | STDIO via master-mcp-proxy (PM2) |
+| Host | n/a (STDIO, not HTTP) |
+| Auth | none (proxy-mediated) |
+| Secret Source | Proxy `.env` (if backend needs secrets) |
+| Secret Keys | n/a (proxy handles auth to external APIs) |
+
+### Backend Health (via proxy)
+```bash
+# Verify backend is reachable through the proxy
+# MCP tool: health_check(backends=["docker-mcp"])
+# Or via curl to proxy health:
+curl -sf http://127.0.0.1:3005/health | python -m json.tool
+```
+
+### Tool Verification
+```bash
+# MCP tool: search_tools("docker-mcp")
+# Expected: list of tools registered by this backend
+```
+
+**Note:** This server has no standalone HTTP endpoint. All access is mediated through
+the master-mcp-proxy. To test specific tools, use `execute_indexed_tool` or the
+tool's hot name if available. Enable scope first: `enable_scopes(["docker"])`.
+
 ## Gotchas
 
 1. **Docker Desktop must be running** - Tools fail silently if daemon unavailable
