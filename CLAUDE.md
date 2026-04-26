@@ -2,14 +2,18 @@
 type: project
 area: mcp-servers
 path: D:\servers\docker-mcp
-status: active
-updated: 2026-01-17
-tags: [docker, containers, images, compose, mcp]
+status: deprecated
+updated: 2026-04-26
+tags: [docker, containers, images, compose, mcp, deprecated]
 ---
 
-# Docker MCP (Python)
+# Docker MCP (Python) [DEPRECATED]
 
-Python-based MCP server providing 18 Docker management tools via natural language.
+**Deprecated 2026-04-26.** Removed from master-mcp-proxy active tool graph.
+Docker operations now use CLI via Bash. Code preserved for reference and
+possible future narrow MCP rebuild (3-5 intent-based tools).
+
+Python-based MCP server providing 25 Docker management tools via natural language.
 
 ## Quick Commands
 
