@@ -12,6 +12,7 @@ Issue log for docker-mcp Python integration.
 
 | Date | Issue | Status |
 |------|-------|--------|
+| 2026-04-26 | WSL2 VM deadlock — Docker engine init hangs | Reboot required |
 | 2026-01-17 | Migrated from Ruby to Python | Complete |
 
 ---
@@ -42,7 +43,34 @@ Issue log for docker-mcp Python integration.
 
 ## Known Issues
 
-### None (Python version works on Windows)
+### 2026-04-26: WSL2 VM Deadlock — Docker Engine Stuck on Starting
+
+**Status:** Reboot required (non-reboot paths exhausted)
+
+**Symptoms:**
+- Docker Desktop stuck on "Starting the Docker Engine"
+- `docker info` / `docker ps` return 500 Internal Server Error
+- Backend log: init API `/ping` returns "context deadline exceeded" in infinite loop
+- `wsl -l -v` hangs when docker-desktop distro is mid-boot
+
+**Root Cause:** WSL2 Hyper-V VM layer deadlocked. The `docker-desktop` WSL distro boots but its init process never completes. vmcompute service restart alone doesn't clear it.
+
+**What Did NOT Fix It:**
+1. Killing all Docker + WSL processes + `wsl --shutdown`
+2. `Restart-Service vmcompute` via gsudo (WSL responds but Docker still hangs)
+3. `wsl --update` (fails: "WslService could not be stopped" even elevated)
+4. Launching Docker Desktop as admin (`-Verb RunAs`)
+5. Multiple full kill-restart cycles
+
+**What Fixes It:**
+- Full Windows reboot (clears Hyper-V/WSL stack completely)
+
+**Contributing Factor:** Container `wyoming-kokoro` was crash-looping (exitCode:1, restartCount:6) prior to the deadlock. May have triggered the VM hang during restart attempts.
+
+**Prevention:**
+- Set crash-looping containers to `--restart=no` or `--restart=on-failure:3`
+- Keep WSL updated: `gsudo wsl --update`
+- UAC must be set to "Never notify" (not fully disabled) for gsudo elevation to work. Registry keys: `EnableLUA=1`, `ConsentPromptBehaviorAdmin=0`
 
 ---
 
