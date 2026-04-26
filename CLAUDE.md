@@ -42,40 +42,11 @@ npx @modelcontextprotocol/inspector uv run mcp-server-docker
 | `README.md` | Full tool documentation |
 | `TROUBLESHOOTING.md` | Issue log |
 
-## Patterns
+## Historical Patterns (no longer active)
 
-- **Scope-based access**: Enable via `enable_scopes(["docker"])`
-- **Tool discovery**: `search_tools("docker")` after enabling
-- **Natural language compose**: Use `docker_compose` prompt for LLM-driven deployments
-- **Disable when done**: `disable_scopes(["docker"])` to reduce attack surface
-
-## Programmatic Testing
-
-| Field | Value |
-|-------|-------|
-| Service | STDIO via master-mcp-proxy (PM2) |
-| Host | n/a (STDIO, not HTTP) |
-| Auth | none (proxy-mediated) |
-| Secret Source | Proxy `.env` (if backend needs secrets) |
-| Secret Keys | n/a (proxy handles auth to external APIs) |
-
-### Backend Health (via proxy)
-```bash
-# Verify backend is reachable through the proxy
-# MCP tool: health_check(backends=["docker-mcp"])
-# Or via curl to proxy health:
-curl -sf http://127.0.0.1:3005/health | python -m json.tool
-```
-
-### Tool Verification
-```bash
-# MCP tool: search_tools("docker-mcp")
-# Expected: list of tools registered by this backend
-```
-
-**Note:** This server has no standalone HTTP endpoint. All access is mediated through
-the master-mcp-proxy. To test specific tools, use `execute_indexed_tool` or the
-tool's hot name if available. Enable scope first: `enable_scopes(["docker"])`.
+This server was previously accessible via `enable_scopes(["docker"])` through
+master-mcp-proxy. That scope and backend registration were removed 2026-04-26.
+Use Docker CLI via Bash for all container operations.
 
 ## Gotchas
 
