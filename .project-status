@@ -1,5 +1,5 @@
 version: 2
-phase: E2E Testing (blocked — WSL2 VM deadlock, reboot required)
-last_activity: 2026-04-26T21:12:00Z
-last_file: TROUBLESHOOTING.md
-task_description: Docker stuck diagnosis, E2E test plan from team consult, UAC elevation fix
+phase: Deprecated — removed from master-mcp-proxy
+last_activity: 2026-04-26T22:19:00Z
+last_file: CLAUDE.md
+task_description: Project deprecated, code preserved for reference
